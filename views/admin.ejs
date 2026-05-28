@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Cup 2026</title>
+
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+
+<div class="admin-container">
+    <h2>Admin Panel</h2>
+
+    <form action="/admin/update-match" method="POST">
+
+        <!-- MATCH SELECT -->
+        <label>Choose Match</label>
+        <select name="match_id" required>
+
+            <% matches.forEach(match => { %>
+                <option value="<%= match.id %>">
+                    <%= match.team1 %> vs <%= match.team2 %>
+                    ( <%= new Date(match.kickoff).toLocaleString() %> )
+                </option>
+            <% }) %>
+
+        </select>
+
+        <hr>
+
+        <!-- RESULT INPUT -->
+        <h3>Match Result</h3>
+
+        <input type="number" name="result1" placeholder="Team 1 Goals" required>
+        <input type="number" name="result2" placeholder="Team 2 Goals" required>
+
+        <hr>
+
+        <!-- POINTS TABLE -->
+        <h3>Assign Points</h3>
+
+        <table border="1" cellpadding="8">
+
+            <tr>
+                <th>User</th>
+                <th>Points</th>
+            </tr>
+
+            <% users.forEach(user => { %>
+
+            <tr>
+
+                <td>
+                    <%= user.username %>
+                    <input type="hidden" name="user_id[]" value="<%= user.id %>">
+                </td>
+
+                <td>
+                    <input type="number" name="points[]" min="0" max="10" value="0">
+                </td>
+
+            </tr>
+
+            <% }) %>
+
+        </table>
+
+        <br>
+
+        <button type="submit">
+            به روز رسانی جدول
+        </button>
+
+    </form>
+
+</div>
+
+
+</body>
+
+</html>

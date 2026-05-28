@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Cup 2026</title>
+
+    <link rel="stylesheet" href="/css/homepage.css">
+</head>
+
+<body>
+<div class="page">
+<div class="upcoming-matches-container">
+
+    <h2 class="title">بازی ها</h2>
+
+    <div class="upcoming-matches">
+
+            <% matches.forEach(match => { %>
+
+                    <% const isLocked = new Date(match.kickoff) < new Date(); %>
+
+                    <form class="match" action="/predict" method="POST">
+
+                        <input type="hidden" name="match_id" value="<%= match.id %>">
+
+                        <div class="date-time">
+                            <span><%= new Date(match.kickoff).toISOString().split('T')[0] %></span>
+                            <span><%= new Date(match.kickoff).toISOString().split('T')[1].slice(0,5) %></span>
+                        </div>
+
+                        <div class="team-row">
+                            <span class="team-name"><%= match.team1 %></span>
+
+                            <input
+                                type="number"
+                                name="pred1"
+                                min="0"
+                                max="10"
+                                class="team-input"
+                                placeholder="-"
+                                <%= isLocked ? "disabled" : "" %>
+                                required
+                            >
+                        </div>
+
+                        <div class="vs">VS</div>
+
+                        <div class="team-row">
+                            <span class="team-name"><%= match.team2 %></span>
+
+                            <input
+                                type="number"
+                                name="pred2"
+                                min="0"
+                                max="10"
+                                class="team-input"
+                                placeholder="-"
+                                <%= isLocked ? "disabled" : "" %>
+                                required
+                            >
+                        </div>
+
+                        <button type="submit" class="submit-btn" <%= isLocked ? "disabled" : "" %>>
+                            ثبت پیش بینی
+                        </button>
+
+                    </form>
+
+                <% }) %>
+    </div>
+
+</div>
+
+        <!-- Table -->
+
+<!-- =========================
+     STANDINGS SECTION
+========================= -->
+
+<div class="standings-section">
+
+    <h2 class="standings-title">جدول امتیازات</h2>
+
+    <div class="table-wrapper">
+
+        <table class="standings-table">
+
+            <!-- =========================
+                 HEADER (MATCHES)
+            ========================== -->
+            <thead>
+                <tr>
+
+                    <!-- Left Sticky Column -->
+                    <th class="sticky-left points-header">
+                        امتیاز
+                    </th>
+
+                    <!-- Dynamic Match Columns -->
+                    <% matches.forEach(match => { %>
+                        <th>
+                            <%= match.team1 %>
+                            <br>
+
+                            <% if (match.is_finished) { %>
+                                <%= match.result1 %> - <%= match.result2 %>
+                            <% } else { %>
+                                VS
+                            <% } %>
+
+                            <br>
+                            <%= match.team2 %>
+                        </th>
+                    <% }) %>
+
+                    <!-- Right Sticky Column -->
+                    <th class="sticky-right player-header">
+                        بازیکن
+                    </th>
+
+                </tr>
+            </thead>
+
+            <!-- =========================
+                 BODY (USERS)
+            ========================== -->
+            <tbody>
+
+                <% users.forEach(user => { %>
+
+                    <tr>
+
+                        <!-- Total Points -->
+                        <td class="sticky-left total-points">
+                            <%= user.total_points ?? 0 %>
+                        </td>
+
+                        <!-- Match Points -->
+                        <% matches.forEach(match => { %>
+
+                            <td>
+                                <%= user.points?.[match.id] ?? "-" %>
+                            </td>
+
+                        <% }) %>
+
+                        <!-- Username -->
+                        <td class="sticky-right player-name">
+                            <%= user.username %>
+                        </td>
+
+                    </tr>
+
+                <% }) %>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+</div>
+<script src="homepage.js"></script>
+
+</body>
+</html>

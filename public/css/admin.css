@@ -1,0 +1,64 @@
+body{
+    margin:0;
+    padding:40px;
+    font-family:tahoma;
+    background:#f2f2f2;
+    direction:rtl;
+}
+
+.admin-container{
+    width:80%;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h2{
+    margin-top:0;
+    color:#222;
+}
+
+select,
+input{
+    padding:10px;
+    margin-top:8px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th{
+    background:#222;
+    color:white;
+}
+
+th, td{
+    padding:12px;
+    text-align:center;
+    border:1px solid #ddd;
+}
+
+button{
+    margin-top:20px;
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#2d8f47;
+    color:white;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.2s;
+}
+
+button:hover{
+    background:#236d36;
+}

@@ -1,0 +1,437 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 80px;
+    background-image: url("1.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: sans-serif;
+}
+
+.page{
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+/* =========================
+   MAIN CONTAINER
+========================= */
+
+.upcoming-matches-container{
+    width: 100%;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.title{
+    color: white;
+    font-size: 26px;
+    margin-bottom: 15px;
+    text-align: right;
+
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+/* =========================
+   SCROLLABLE MATCH AREA
+========================= */
+
+.upcoming-matches{
+    display: flex;
+    gap: 15px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding: 15px;
+
+    border-radius: 18px;
+
+    background: rgba(255,255,255,0.12);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* scrollbar */
+
+.upcoming-matches::-webkit-scrollbar{
+    height: 8px;
+}
+
+.upcoming-matches::-webkit-scrollbar-track{
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+.upcoming-matches::-webkit-scrollbar-thumb{
+    background: rgba(255,255,255,0.35);
+    border-radius: 10px;
+}
+
+/* =========================
+   MATCH CARD
+========================= */
+
+.match{
+    min-width: 190px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    background: rgba(255,255,255,0.18);
+
+    transition: 0.2s ease;
+}
+
+.match:hover{
+    transform: translateY(-4px);
+
+    background: rgba(255,255,255,0.24);
+}
+
+/* =========================
+   DATE & TIME
+========================= */
+
+.date-time{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-bottom: 15px;
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    gap: 4px;
+}
+
+/* =========================
+   TEAM ROW
+========================= */
+
+.team-row{
+    width: 100%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin: 8px 0;
+
+    direction: rtl;
+}
+
+/* =========================
+   TEAM NAME
+========================= */
+
+.team-name{
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* =========================
+   INPUT
+========================= */
+
+.team-input{
+    width: 48px;
+    height: 48px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: rgba(255,255,255,0.2);
+
+    color: white;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    text-align: center;
+
+    outline: none;
+
+    transition: 0.2s ease;
+
+    -moz-appearance: textfield;
+}
+
+/* remove arrows */
+
+.team-input::-webkit-outer-spin-button,
+.team-input::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.team-input:focus{
+    background: rgba(255,255,255,0.35);
+
+    transform: scale(1.05);
+}
+
+/* placeholder */
+
+.team-input::placeholder{
+    color: rgba(255,255,255,0.5);
+}
+
+/* =========================
+   VS TEXT
+========================= */
+
+.vs{
+    margin: 8px 0;
+
+    color: rgba(255,255,255,0.8);
+
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* =========================
+   SUBMIT BUTTON
+========================= */
+
+.submit-btn{
+    margin-top: 15px;
+
+    width: 100%;
+    height: 38px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: rgba(255,255,255,0.22);
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.submit-btn:hover{
+    background: rgba(255,255,255,0.35);
+
+    transform: scale(1.02);
+}
+
+.submit-btn:active{
+    transform: scale(0.98);
+}
+
+/* =========================
+   STANDINGS SECTION
+========================= */
+
+.standings-section{
+    width: 100%;
+    margin: 40px auto;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.standings-title{
+    color: white;
+
+    font-size: 26px;
+
+    margin-bottom: 15px;
+
+    text-align: right;
+
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+/* =========================
+   TABLE WRAPPER
+========================= */
+
+.table-wrapper{
+    overflow-x: auto;
+
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.12);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    padding: 15px;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.standings-table{
+    border-collapse: collapse;
+
+    min-width: 1000px;
+    width: 100%;
+
+    text-align: center;
+
+    color: white;
+}
+
+/* =========================
+   CELLS
+========================= */
+
+.standings-table th,
+.standings-table td{
+
+    padding: 18px 14px;
+
+    border: 1px solid rgba(255,255,255,0.15);
+
+    background: rgba(255,255,255,0.08);
+
+    min-width: 110px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.standings-table thead th{
+
+    position: sticky;
+    top: 0;
+
+    z-index: 5;
+
+    background: rgba(20,20,20,0.85);
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* =========================
+   STICKY LEFT COLUMN
+========================= */
+
+.sticky-left{
+
+    position: sticky;
+    left: 0;
+
+    z-index: 6;
+
+    background: rgba(25,25,25,0.95) !important;
+}
+
+/* =========================
+   STICKY RIGHT COLUMN
+========================= */
+
+.sticky-right{
+
+    position: sticky;
+    right: 0;
+
+    z-index: 6;
+
+    background: rgba(25,25,25,0.95) !important;
+}
+
+/* =========================
+   PLAYER NAMES
+========================= */
+
+.player-name{
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* =========================
+   TOTAL POINTS
+========================= */
+
+.total-points{
+    font-weight: bold;
+
+    color: #ffe066;
+}
+
+/* =========================
+   HOVER EFFECT
+========================= */
+
+.standings-table tbody tr:hover td{
+    background: rgba(255,255,255,0.15);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px){
+
+    body{
+        padding-top: 40px;
+    }
+
+    .title{
+        font-size: 22px;
+    }
+
+    .match{
+        min-width: 170px;
+    }
+
+    .team-name{
+        font-size: 15px;
+    }
+
+    .team-input{
+        width: 44px;
+        height: 44px;
+
+        font-size: 22px;
+    }
+        .standings-title{
+        font-size: 22px;
+    }
+
+    .standings-table th,
+    .standings-table td{
+
+        padding: 14px 10px;
+
+        font-size: 14px;
+
+        min-width: 90px;
+    }
+
+}
