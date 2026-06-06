@@ -58,7 +58,7 @@
                 </td>
 
                 <td>
-                    <input type="number" name="points[]" min="0" max="10" value="0">
+                    <input type="number" name="points[]" step="0.1" class="points-input"/>
                 </td>
 
             </tr>
@@ -74,6 +74,223 @@
         </button>
 
     </form>
+    <hr>
+
+<!-- =========================
+     USER MANAGEMENT
+========================= -->
+
+    <h3>
+        User Management
+    </h3>
+
+    <!-- CREATE USER -->
+
+    <form action="/admin/users/create" method="POST">
+
+        <input
+            type="text"
+            name="username"
+            placeholder="New Username"
+            required
+        >
+        <input 
+            type="text"
+            name="display_name"
+            placeholder="Farsi Name"
+            required
+        >
+
+        <button type="submit">
+            Create User
+        </button>
+
+    </form>
+
+    <br>
+
+    <!-- USERS LIST -->
+
+    <table border="1" cellpadding="8">
+
+        <tr>
+
+            <th>
+                Username
+            </th>
+
+            <th>
+                Reset Password
+            </th>
+
+            <th>
+                Delete User
+            </th>
+
+        </tr>
+
+        <% users.forEach(user => { %>
+
+        <tr>
+
+            <td>
+                <%= user.username %>
+            </td>
+
+            <!-- RESET PASSWORD -->
+
+            <td>
+
+                <form
+                    action="/admin/users/reset-password"
+                    method="POST"
+                >
+
+                    <input
+                        type="hidden"
+                        name="user_id"
+                        value="<%= user.id %>"
+                    >
+
+                    <button type="submit">
+                        Reset Password
+                    </button>
+
+                </form>
+
+            </td>
+
+            <!-- DELETE USER -->
+
+            <td>
+
+                <form
+                    action="/admin/users/delete"
+                    method="POST"
+                >
+
+                    <input
+                        type="hidden"
+                        name="user_id"
+                        value="<%= user.id %>"
+                    >
+
+                    <button type="submit">
+                        Delete
+                    </button>
+
+                </form>
+
+            </td>
+
+        </tr>
+
+        <% }) %>
+
+    </table>
+
+    <hr>
+
+        <!-- =========================
+            MATCH MANAGEMENT
+        ========================= -->
+
+        <h3>
+            Match Management
+        </h3>
+
+        <!-- CREATE MATCH -->
+
+        <form action="/admin/matches/create" method="POST">
+
+            <input
+                type="text"
+                name="team1"
+                placeholder="Team 1"
+                required
+            >
+
+            <input
+                type="text"
+                name="team2"
+                placeholder="Team 2"
+                required
+            >
+
+            <input
+                type="datetime-local"
+                name="kickoff"
+                required
+            >
+
+            <button type="submit">
+                Add Match
+            </button>
+
+        </form>
+
+        <br>
+
+        <!-- MATCHES TABLE -->
+
+        <table border="1" cellpadding="8">
+
+            <tr>
+
+                <th>
+                    Match
+                </th>
+
+                <th>
+                    Kickoff
+                </th>
+
+                <th>
+                    Delete
+                </th>
+
+            </tr>
+
+            <% matches.forEach(match => { %>
+
+            <tr>
+
+                <td>
+                    <%= match.team1 %>
+                    VS
+                    <%= match.team2 %>
+                </td>
+
+                <td>
+                    <%= new Date(match.kickoff).toLocaleString() %>
+                </td>
+
+                <td>
+
+                    <form
+                        action="/admin/matches/delete"
+                        method="POST"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="match_id"
+                            value="<%= match.id %>"
+                        >
+
+                        <button type="submit">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            <% }) %>
+
+        </table>
 
 </div>
 

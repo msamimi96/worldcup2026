@@ -10,23 +10,57 @@
 
 <body>
 <div class="page">
+        <div class="top-bar">
+
+            <div class="user-name">
+                خوش آمدی، <%= user.display_name %>
+            </div>
+
+            <form action="/logout" method="POST">
+                <button type="submit">خروج</button>
+            </form>
+
+        </div>
 <div class="upcoming-matches-container">
 
     <h2 class="title">بازی ها</h2>
 
-    <div class="upcoming-matches">
+    <div class="upcoming-matches" id="matchesContainer">
 
             <% matches.forEach(match => { %>
 
                     <% const isLocked = new Date(match.kickoff) < new Date(); %>
 
-                    <form class="match" action="/predict" method="POST">
+                    <form class="match" data-kickoff="<%= new Date(match.kickoff).toISOString() %>" action="/predict" method="POST">
 
                         <input type="hidden" name="match_id" value="<%= match.id %>">
 
                         <div class="date-time">
-                            <span><%= new Date(match.kickoff).toISOString().split('T')[0] %></span>
-                            <span><%= new Date(match.kickoff).toISOString().split('T')[1].slice(0,5) %></span>
+
+                            <span>
+                                <%= new Intl.DateTimeFormat(
+                                    'fa-IR-u-ca-persian',
+                                    {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        timeZone: 'Asia/Tehran'
+                                    }
+                                ).format(new Date(match.kickoff)) %>
+                            </span>
+
+                            <span>
+                                <%= new Intl.DateTimeFormat(
+                                    'fa-IR',
+                                    {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false,
+                                        timeZone: 'Asia/Tehran'
+                                    }
+                                ).format(new Date(match.kickoff)) %>
+                            </span>
+
                         </div>
 
                         <div class="team-row">
@@ -60,6 +94,12 @@
                                 required
                             >
                         </div>
+
+                        <textarea
+                            name="side_prediction"
+                            placeholder="پیش بینی جانبی..."
+                            maxlength="255"
+                        ></textarea>
 
                         <button type="submit" class="submit-btn" <%= isLocked ? "disabled" : "" %>>
                             ثبت پیش بینی
@@ -125,36 +165,66 @@
             <!-- =========================
                  BODY (USERS)
             ========================== -->
-            <tbody>
+                <tbody>
 
-                <% users.forEach(user => { %>
+                    <% users.forEach((user, index) => { %>
 
-                    <tr>
+                        <tr class="
+                            <%= index === 0 ? 'gold' : '' %>
+                            <%= index === 1 ? 'silver' : '' %>
+                            <%= index === 2 ? 'bronze' : '' %>
+                        ">
 
-                        <!-- Total Points -->
-                        <td class="sticky-left total-points">
-                            <%= user.total_points ?? 0 %>
-                        </td>
-
-                        <!-- Match Points -->
-                        <% matches.forEach(match => { %>
-
-                            <td>
-                                <%= user.points?.[match.id] ?? "-" %>
+                            <!-- Rank (NEW) -->
+                            <td class="rank">
+                                <%= index + 1 %>
                             </td>
 
-                        <% }) %>
+                            <!-- Total Points -->
+                            <td class="sticky-left total-points">
+                                <%= user.total_points ?? 0 %>
+                            </td>
 
-                        <!-- Username -->
-                        <td class="sticky-right player-name">
-                            <%= user.username %>
-                        </td>
+                            <!-- Match Points -->
+                            <% matches.forEach(match => { %>
 
-                    </tr>
+                                <td>
+                                    <%= user.points?.[match.id] ?? "-" %>
+                                </td>
 
-                <% }) %>
+                            <% }) %>
 
-            </tbody>
+                            <!-- Username -->
+                            <td class="sticky-right player-name">
+
+                                <div class="player-hover">
+
+                                    <span class="player-link">
+                                        <%= user.display_name %>
+                                    </span>
+
+                                    <div class="hover-card">
+
+                                        <% if (user.ranking_prediction) { %>
+
+                                            <p>🥇 <%= user.ranking_prediction.first_place %></p>
+                                            <p>🥈 <%= user.ranking_prediction.second_place %></p>
+                                            <p>🥉 <%= user.ranking_prediction.third_place %></p>
+                                            <p>4️⃣ <%= user.ranking_prediction.fourth_place %></p>
+
+                                        <% } %>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    <% }) %>
+
+                </tbody>
 
         </table>
 
@@ -164,5 +234,43 @@
 </div>
 <script src="homepage.js"></script>
 
+
+<script>
+
+window.addEventListener("load", () => {
+
+    const container =
+        document.getElementById("matchesContainer");
+
+    const matches =
+        document.querySelectorAll(".match");
+
+    const now = new Date();
+
+    let targetMatch = null;
+
+    // find first upcoming match
+    matches.forEach(match => {
+
+        const kickoff =
+            new Date(match.dataset.kickoff);
+
+        if (!targetMatch && kickoff > now) {
+            targetMatch = match;
+        }
+
+    });
+
+    // scroll to it
+    if (targetMatch) {
+
+        container.scrollLeft =
+            targetMatch.offsetLeft;
+
+    }
+
+});
+
+</script>
 </body>
 </html>

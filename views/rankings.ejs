@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+    <meta charset="UTF-8">
+    <title>پیش بینی رتبه بندی</title>
+
+    <link rel="stylesheet" href="/css/rankings.css">
+</head>
+
+<body>
+
+<div class="rankings-container">
+
+    <h1>
+        پیش بینی رتبه های جام جهانی
+    </h1>
+
+    <form action="/submit-rankings" method="POST">
+
+        <div class="field">
+            <label>قهرمان 🏆</label>
+            <input type="text" name="first_place" required>
+        </div>
+
+        <div class="field">
+            <label>نایب قهرمان 🥈</label>
+            <input type="text" name="second_place" required>
+        </div>
+
+        <div class="field">
+            <label>مقام سوم 🥉</label>
+            <input type="text" name="third_place" required>
+        </div>
+
+        <div class="field">
+            <label>مقام چهارم</label>
+            <input type="text" name="fourth_place" required>
+        </div>
+
+        <button type="submit">
+            ثبت پیش بینی
+        </button>
+
+        <hr>
+
+        <h2>
+            مدعیان احتمالی قهرمانی
+        </h2>
+
+        <div class="field">
+            <label>
+                مدعی اول قهرمانی
+            </label>
+
+            <input type="text" name="probable1" required>
+        </div>
+
+        <div class="field">
+            <label>
+                مدعی دوم قهرمانی
+            </label>
+
+            <input type="text" name="probable2" required>
+        </div>
+
+        <div class="field">
+            <label>
+                مدعی سوم قهرمانی
+            </label>
+
+            <input type="text" name="probable3" required>
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

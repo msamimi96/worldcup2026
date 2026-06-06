@@ -8,16 +8,12 @@ body{
     min-height: 100vh;
     margin: 0;
     padding-top: 80px;
-    background-image: url("/images/1.jpg");
+    background-image: url("1.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     font-family: sans-serif;
-}
-
-.upcoming-matches {
-    scroll-behavior: smooth;
 }
 
 .page{
@@ -395,67 +391,6 @@ body{
     background: rgba(255,255,255,0.15);
 }
 
-.player-hover {
-
-    position: relative;
-    display: inline-block;
-
-}
-
-.player-link {
-
-    cursor: pointer;
-    font-weight: bold;
-
-}
-
-.hover-card {
-
-    position: absolute;
-    right: 0;
-    top: 120%;
-
-    background: white;
-    color: black;
-
-    padding: 10px;
-    border-radius: 10px;
-
-    min-width: 180px;
-
-    display: none;
-
-    z-index: 999;
-
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-
-}
-
-.player-hover:hover .hover-card {
-
-    display: block;
-
-}
-.gold {
-    background: linear-gradient(90deg, #ffd700, #fff3b0);
-    font-weight: bold;
-}
-
-.silver {
-    background: linear-gradient(90deg, #c0c0c0, #eeeeee);
-    font-weight: bold;
-}
-
-.bronze {
-    background: linear-gradient(90deg, #cd7f32, #f2d2b6);
-    font-weight: bold;
-}
-
-.rank {
-    width: 40px;
-    text-align: center;
-    font-weight: bold;
-}
 
 /* =========================
    MOBILE

@@ -1,37 +1,79 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../database/db");
-
+module.exports = router;
 
 /* ===== ADMIN PROTECTION ===== */
 function isAdmin(req, res, next) {
-    if (!req.session.user || req.session.user.role !== "admin") {
+
+    if (!req.session.user) {
+        return res.redirect("/");
+    }
+
+    if (req.session.user.role !== "admin") {
         return res.send("Access denied");
     }
+
     next();
+
 }
+
+router.get("/admin", isAdmin, (req, res) => {
+
+    const usersSql = `
+        SELECT id, username
+        FROM users
+        WHERE role = 'user'
+    `;
+
+    const matchesSql = `
+        SELECT *
+        FROM matches
+        ORDER BY kickoff ASC
+    `;
+
+    db.query(usersSql, (err, users) => {
+
+        if (err) return res.send("Users DB error");
+
+        db.query(matchesSql, (err, matches) => {
+
+            if (err) return res.send("Matches DB error");
+
+            res.render("admin", {
+                users,
+                matches
+            });
+
+        });
+
+    });
+
+});
 
 /* =========================
    ADD MATCH (ADMIN)
 ========================= */
 
-router.post("/admin/add-match", isAdmin, (req, res) => {
+router.post("/admin/matches/create", isAdmin, (req, res) => {
 
-    const { team1, team2, kickoff } = req.body;
+    const {
+        team1,
+        team2,
+        kickoff
+    } = req.body;
 
     const sql = `
-        INSERT INTO matches (team1, team2, kickoff)
+        INSERT INTO matches
+        (team1, team2, kickoff)
         VALUES (?, ?, ?)
     `;
 
     db.query(sql, [team1, team2, kickoff], (err) => {
 
-        if (err) {
-            console.log(err);
-            return res.send("Error adding match");
-        }
+        if (err) return res.send("Create match error");
 
-        res.redirect("/home");
+        res.redirect("/admin");
 
     });
 
@@ -39,6 +81,24 @@ router.post("/admin/add-match", isAdmin, (req, res) => {
 
 module.exports = router;
 
+router.post("/admin/matches/delete", isAdmin, (req, res) => {
+
+    const { match_id } = req.body;
+
+    const sql = `
+        DELETE FROM matches
+        WHERE id = ?
+    `;
+
+    db.query(sql, [match_id], (err) => {
+
+        if (err) return res.send("Delete match error");
+
+        res.redirect("/admin");
+
+    });
+
+});
 
 /* =========================
    UPDATE MATCH + POINTS
@@ -74,11 +134,17 @@ router.post("/admin/update-match", isAdmin, (req, res) => {
                 VALUES ?
             `;
 
-            const values = user_id.map((id, i) => [
-                id,
-                match_id,
-                points[i] || 0
-            ]);
+            const values = user_id.map((id, i) => {
+
+                const value = Number(points[i]);
+
+                return [
+                    id,
+                    match_id,
+                    isNaN(value) ? 0 : value
+                ];
+
+            });
 
             db.query(insertSql, [values], (err) => {
 
@@ -94,25 +160,61 @@ router.post("/admin/update-match", isAdmin, (req, res) => {
 
 });
 
-router.get("/admin", isAdmin, (req, res) => {
 
-    const matchSql = "SELECT * FROM matches ORDER BY kickoff ASC";
-    const userSql = "SELECT id, username FROM users";
 
-    db.query(matchSql, (err, matches) => {
+router.post("/admin/users/create", isAdmin, (req, res) => {
 
-        if (err) return res.send("DB error (matches)");
+    const { username } = req.body;
 
-        db.query(userSql, (err, users) => {
+    const sql = `
+        INSERT INTO users (username, password, role, display_name)
+        VALUES (?, NULL, 'user', ?)
+    `;
 
-            if (err) return res.send("DB error (users)");
+    db.query(sql, [username], (err) => {
 
-            res.render("admin", {
-                matches,
-                users
-            });
+        if (err) return res.send("Create user error");
 
-        });
+        res.redirect("/admin");
+
+    });
+
+});
+
+router.post("/admin/users/delete", isAdmin, (req, res) => {
+
+    const { user_id } = req.body;
+
+    const sql = `
+        DELETE FROM users
+        WHERE id = ?
+    `;
+
+    db.query(sql, [user_id], (err) => {
+
+        if (err) return res.send("Delete user error");
+
+        res.redirect("/admin");
+
+    });
+
+});
+
+router.post("/admin/users/reset-password", isAdmin, (req, res) => {
+
+    const { user_id } = req.body;
+
+    const sql = `
+        UPDATE users
+        SET password = NULL
+        WHERE id = ?
+    `;
+
+    db.query(sql, [user_id], (err) => {
+
+        if (err) return res.send("Reset password error");
+
+        res.redirect("/admin");
 
     });
 
