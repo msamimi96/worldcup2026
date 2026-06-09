@@ -58,11 +58,34 @@ router.post("/predict", isUser, (req, res) => {
 
             if (err) return res.send("DB error");
 
+            // 3. If prediction exists → UPDATE it
             if (result.length > 0) {
-                return res.send("You already predicted this match");
+
+                const updateSql = `
+                    UPDATE predictions
+                    SET pred1 = ?,
+                        pred2 = ?,
+                        side_prediction = ?
+                    WHERE user_id = ? AND match_id = ?
+                `;
+
+                return db.query(
+                    updateSql,
+                    [
+                        pred1,
+                        pred2,
+                        side_prediction,
+                        userId,
+                        match_id
+                    ],
+                    (err) => {
+                        if (err) return res.send("Update error");
+                        res.redirect("/home");
+                    }
+                );
             }
 
-            // 3. Insert prediction
+            // 4. Otherwise → INSERT new prediction
             const insertSql = `
                 INSERT INTO predictions
                 (
@@ -75,7 +98,8 @@ router.post("/predict", isUser, (req, res) => {
                 VALUES (?, ?, ?, ?, ?)
             `;
 
-            db.query(insertSql,
+            db.query(
+                insertSql,
                 [
                     userId,
                     match_id,
@@ -84,11 +108,8 @@ router.post("/predict", isUser, (req, res) => {
                     side_prediction
                 ],
                 (err) => {
-
                     if (err) return res.send("Insert error");
-
                     res.redirect("/home");
-
                 }
             );
 
@@ -158,9 +179,6 @@ router.post("/submit-rankings", isUser, (req, res) => {
         second_place,
         third_place,
         fourth_place,
-        probable1,
-        probable2,
-        probable3
     } = req.body;
 
     // check if rankings already exist
@@ -186,10 +204,7 @@ router.post("/submit-rankings", isUser, (req, res) => {
                     first_place = ?,
                     second_place = ?,
                     third_place = ?,
-                    fourth_place = ?,
-                    probable1 = ?,
-                    probable2 = ?,
-                    probable3 = ?
+                    fourth_place = ?
                 WHERE user_id = ?
             `;
 
@@ -200,9 +215,6 @@ router.post("/submit-rankings", isUser, (req, res) => {
                     second_place,
                     third_place,
                     fourth_place,
-                    probable1,
-                    probable2,
-                    probable3,
                     userId
                 ],
                 (err) => {
@@ -229,12 +241,9 @@ router.post("/submit-rankings", isUser, (req, res) => {
                     first_place,
                     second_place,
                     third_place,
-                    fourth_place,
-                    probable1,
-                    probable2,
-                    probable3
+                    fourth_place
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?)
             `;
 
             db.query(
@@ -244,10 +253,7 @@ router.post("/submit-rankings", isUser, (req, res) => {
                     first_place,
                     second_place,
                     third_place,
-                    fourth_place,
-                    probable1,
-                    probable2,
-                    probable3
+                    fourth_place
                 ],
                 (err) => {
 

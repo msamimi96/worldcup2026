@@ -1,33 +1,33 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
-
 const router = express.Router();
-
+const bcrypt = require("bcrypt");
 const db = require("../database/db");
 
 /* =========================
    LOGIN PAGE
 ========================= */
-
 router.get("/", (req, res) => {
-
     res.render("login");
-
 });
 
 /* =========================
    LOGIN
 ========================= */
-
 router.post("/login", (req, res) => {
 
     const { username, password } = req.body;
 
-    const sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+    const sql = `
+        SELECT * FROM users
+        WHERE username = ?
+    `;
 
-    db.query(sql, [username, password], (err, results) => {
+    db.query(sql, [username], async (err, results) => {
 
-        if (err) return res.send("DB error");
+        if (err) {
+            console.log(err);
+            return res.send("DB error");
+        }
 
         if (results.length === 0) {
             return res.send("Invalid login");
@@ -35,19 +35,37 @@ router.post("/login", (req, res) => {
 
         const user = results[0];
 
-        // save session
-        req.session.user = {
-            id: user.id,
-            username: user.username,
-            role: user.role,
-            display_name: user.display_name
-        };
+        if (!user.password) {
+            return res.send("No password found");
+        }
 
-        // ROLE-BASED REDIRECT
-        if (user.role === "admin") {
-            return res.redirect("/admin");
-        } else {
+        try {
+
+            const match =
+                await bcrypt.compare(password, user.password);
+
+            if (!match) {
+                return res.send("Invalid login");
+            }
+
+            req.session.user = {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                display_name: user.display_name
+            };
+
+            if (user.role === "admin") {
+                return res.redirect("/admin");
+            }
+
             return res.redirect("/home");
+
+        } catch (err) {
+
+            console.log(err);
+            return res.send("bcrypt error");
+
         }
 
     });
@@ -55,100 +73,102 @@ router.post("/login", (req, res) => {
 });
 
 /* =========================
-   HOME
+   HOME (CLEAN VERSION)
 ========================= */
-
 router.get("/home", (req, res) => {
 
     if (!req.session.user) {
         return res.redirect("/");
     }
 
-    // 1. Get matches
+    const userId = req.session.user.id;
+
     const matchSql = `
         SELECT *
         FROM matches
-        ORDER BY kickoff ASC
+        ORDER BY kickoff DESC
     `;
 
-    db.query(matchSql, (err, matches) => {
+    const userSql = `
+        SELECT id, username, display_name
+        FROM users
+        WHERE role = 'user'
+    `;
 
+    const pointsSql = `
+        SELECT *
+        FROM points
+    `;
+
+    const predictionsSql = `
+        SELECT *
+        FROM predictions
+    `;
+
+    const rankingSql = `
+        SELECT *
+        FROM rankings_prediction
+    `;
+
+    // 1. Get matches
+    db.query(matchSql, (err, matches) => {
         if (err) return res.send("DB error (matches)");
 
         // 2. Get users
-        const userSql = `
-            SELECT id, username, display_name
-            FROM users
-        `;
-
         db.query(userSql, (err, users) => {
-
             if (err) return res.send("DB error (users)");
 
             // 3. Get points
-            const pointsSql = `
-                SELECT *
-                FROM points
-            `;
-
             db.query(pointsSql, (err, points) => {
-
                 if (err) return res.send("DB error (points)");
 
-                // 4. Build users map
-                const userMap = {};
+                // 4. Get predictions
+                db.query(predictionsSql, (err, predictions) => {
+                    if (err) return res.send("DB error (predictions)");
 
-                users.forEach(u => {
+                    // 5. Get rankings
+                    db.query(rankingSql, (err, rankings) => {
+                        if (err) return res.send("DB error (rankings)");
 
-                    userMap[u.id] = {
-                        id: u.id,
-                        username: u.username,
-                        display_name: u.display_name,
-                        total_points: 0,
-                        points: {}
-                    };
+                        // =========================
+                        // BUILD USER MAP
+                        // =========================
+                        const userMap = {};
 
-                });
+                        users.forEach(u => {
+                            userMap[u.id] = {
+                                id: u.id,
+                                username: u.username,
+                                display_name: u.display_name,
+                                total_points: 0,
+                                points: {},
+                                ranking_prediction: null
+                            };
+                        });
 
-                // 5. Fill points
-                points.forEach(p => {
+                        // =========================
+                        // ADD POINTS
+                        // =========================
+                        points.forEach(p => {
+                            if (!userMap[p.user_id]) return;
 
-                    if (userMap[p.user_id]) {
+                            userMap[p.user_id].total_points += Number(p.points);
 
-                        userMap[p.user_id].total_points += Number(p.points);
+                            userMap[p.user_id].points[p.match_id] = {
+                                points: Number(p.points)
+                            };
+                        });
 
-                        userMap[p.user_id].points[p.match_id] = {
-                            points: p.points
-                        };
+                        // =========================
+                        // ADD PREDICTIONS
+                        // =========================
+                        predictions.forEach(pred => {
+                            if (!userMap[pred.user_id]) return;
 
-                    }
-
-                });
-
-                // 6. Get predictions
-                const predictionSql = `
-                    SELECT *
-                    FROM predictions
-                `;
-
-                db.query(predictionSql, (err, predictions) => {
-
-                    if (err) {
-                        return res.send("DB error (predictions)");
-                    }
-
-                    // attach predictions
-                    predictions.forEach(pred => {
-
-                        if (userMap[pred.user_id]) {
-
-                            // create object if not exists
                             if (!userMap[pred.user_id].points[pred.match_id]) {
-
                                 userMap[pred.user_id].points[pred.match_id] = {
                                     points: 0
                                 };
-
                             }
 
                             userMap[pred.user_id].points[pred.match_id].prediction =
@@ -156,94 +176,68 @@ router.get("/home", (req, res) => {
 
                             userMap[pred.user_id].points[pred.match_id].side_prediction =
                                 pred.side_prediction;
-
-                        }
-
-                    });
-                    
-                    const allRankingsSql = `
-                        SELECT *
-                        FROM rankings_prediction
-                    `;
-
-                    db.query(allRankingsSql, (err, rankings) => {
-
-                        if (err) {
-                            return res.send("DB error (rankings)");
-                        }
-
-                        rankings.forEach(r => {
-
-                            if (userMap[r.user_id]) {
-
-                                userMap[r.user_id].ranking_prediction = {
-                                    first_place: r.first_place,
-                                    second_place: r.second_place,
-                                    third_place: r.third_place,
-                                    fourth_place: r.fourth_place
-                                };
-
-                            }
-
                         });
 
-                    // 7. Sort leaderboard
-                    const userList = Object.values(userMap)
-                        .sort((a, b) => b.total_points - a.total_points);
+                        // =========================
+                        // ADD RANKING PREDICTIONS
+                        // =========================
+                        rankings.forEach(r => {
+                            if (!userMap[r.user_id]) return;
 
-                    // 8. Rankings check
-                    const rankingSql = `
-                        SELECT *
-                        FROM rankings_prediction
-                        WHERE user_id = ?
-                    `;
+                            userMap[r.user_id].ranking_prediction = {
+                                first_place: r.first_place,
+                                second_place: r.second_place,
+                                third_place: r.third_place,
+                                fourth_place: r.fourth_place
+                            };
+                        });
 
-                    db.query(
-                        rankingSql,
-                        [req.session.user.id],
-                        (err, rankingResult) => {
+                        // =========================
+                        // SORT USERS
+                        // =========================
+                        const userList = Object.values(userMap)
+                            .sort((a, b) => b.total_points - a.total_points);
 
-                            if (err) {
-                                return res.send("DB error (rankings)");
-                            }
+                        // =========================
+                        // CHECK CURRENT USER RANKING
+                        // =========================
+                        const checkSql = `
+                            SELECT *
+                            FROM rankings_prediction
+                            WHERE user_id = ?
+                        `;
 
-                            // if rankings not submitted
-                            if (rankingResult.length === 0) {
+                        db.query(checkSql, [userId], (err, result) => {
+                            if (err) return res.send("DB error (ranking check)");
+
+                            if (result.length === 0) {
                                 return res.redirect("/rankings-prediction");
                             }
 
-                            // 9. Render home
-                            res.render("home", {
+                            // =========================
+                            // FINAL RENDER
+                            // =========================
+                            return res.render("home", {
                                 user: req.session.user,
                                 matches,
-                                users: userList
+                                users: userList,
+                                now: new Date()
                             });
-
-                        }
-                    );
-
+                        });
+                    });
                 });
-
             });
-
         });
-
     });
-
 });
 
 /* =========================
    LOGOUT
 ========================= */
-
 router.post("/logout", (req, res) => {
-
     req.session.destroy(() => {
-
         res.redirect("/");
-
     });
-
 });
 
 module.exports = router;

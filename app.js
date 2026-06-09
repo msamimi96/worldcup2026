@@ -7,21 +7,29 @@ const path = require("path");
 const app = express();
 
 /* =========================
-   MIDDLEWARE (IMPORTANT ORDER)
+   SECURITY
 ========================= */
 
-// 1. body parser FIRST
+app.disable("x-powered-by");
+
+/* =========================
+   MIDDLEWARE
+========================= */
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// 2. session SECOND
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 }));
 
-// 3. static files
 app.use(express.static(path.join(__dirname, "public")));
 
 /* =========================
@@ -43,10 +51,18 @@ app.use("/", userRoutes);
 app.use("/", adminRoutes);
 
 /* =========================
+   404 HANDLER
+========================= */
+
+app.use((req, res) => {
+    res.status(404).send("Page not found");
+});
+
+/* =========================
    SERVER
 ========================= */
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

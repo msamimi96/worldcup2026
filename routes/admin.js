@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../database/db");
-module.exports = router;
+const bcrypt = require("bcrypt");
 
-/* ===== ADMIN PROTECTION ===== */
+/* =========================
+   ADMIN PROTECTION
+========================= */
+
 function isAdmin(req, res, next) {
 
     if (!req.session.user) {
@@ -18,10 +21,14 @@ function isAdmin(req, res, next) {
 
 }
 
+/* =========================
+   ADMIN PAGE
+========================= */
+
 router.get("/admin", isAdmin, (req, res) => {
 
     const usersSql = `
-        SELECT id, username
+        SELECT id, username, display_name
         FROM users
         WHERE role = 'user'
     `;
@@ -42,7 +49,8 @@ router.get("/admin", isAdmin, (req, res) => {
 
             res.render("admin", {
                 users,
-                matches
+                matches,
+                user: req.session.user  
             });
 
         });
@@ -52,7 +60,7 @@ router.get("/admin", isAdmin, (req, res) => {
 });
 
 /* =========================
-   ADD MATCH (ADMIN)
+   CREATE MATCH
 ========================= */
 
 router.post("/admin/matches/create", isAdmin, (req, res) => {
@@ -71,7 +79,10 @@ router.post("/admin/matches/create", isAdmin, (req, res) => {
 
     db.query(sql, [team1, team2, kickoff], (err) => {
 
-        if (err) return res.send("Create match error");
+        if (err) {
+            console.log(err);
+            return res.send(err);
+        }
 
         res.redirect("/admin");
 
@@ -79,24 +90,57 @@ router.post("/admin/matches/create", isAdmin, (req, res) => {
 
 });
 
-module.exports = router;
+/* =========================
+   DELETE MATCH
+========================= */
 
 router.post("/admin/matches/delete", isAdmin, (req, res) => {
 
     const { match_id } = req.body;
 
-    const sql = `
-        DELETE FROM matches
-        WHERE id = ?
-    `;
+    // delete predictions first
+    db.query(
+        "DELETE FROM predictions WHERE match_id = ?",
+        [match_id],
+        (err) => {
 
-    db.query(sql, [match_id], (err) => {
+            if (err) {
+                console.log(err);
+                return res.send(err);
+            }
 
-        if (err) return res.send("Delete match error");
+            // delete points
+            db.query(
+                "DELETE FROM points WHERE match_id = ?",
+                [match_id],
+                (err) => {
 
-        res.redirect("/admin");
+                    if (err) {
+                        console.log(err);
+                        return res.send(err);
+                    }
 
-    });
+                    // finally delete match
+                    db.query(
+                        "DELETE FROM matches WHERE id = ?",
+                        [match_id],
+                        (err) => {
+
+                            if (err) {
+                                console.log(err);
+                                return res.send(err);
+                            }
+
+                            res.redirect("/admin");
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
 
 });
 
@@ -106,9 +150,15 @@ router.post("/admin/matches/delete", isAdmin, (req, res) => {
 
 router.post("/admin/update-match", isAdmin, (req, res) => {
 
-    const { match_id, result1, result2, user_id, points } = req.body;
+    const {
+        match_id,
+        result1,
+        result2,
+        user_id,
+        points
+    } = req.body;
 
-    // 1. update match result
+    // update result
     const matchSql = `
         UPDATE matches
         SET result1 = ?, result2 = ?, is_finished = TRUE
@@ -117,20 +167,28 @@ router.post("/admin/update-match", isAdmin, (req, res) => {
 
     db.query(matchSql, [result1, result2, match_id], (err) => {
 
-        if (err) return res.send("Match update error");
+        if (err) {
+            console.log(err);
+            return res.send(err);
+        }
 
-        // 2. delete old points for this match
+        // delete old points
         const deleteSql = `
-            DELETE FROM points WHERE match_id = ?
+            DELETE FROM points
+            WHERE match_id = ?
         `;
 
         db.query(deleteSql, [match_id], (err) => {
 
-            if (err) return res.send("Delete error");
+            if (err) {
+                console.log(err);
+                return res.send(err);
+            }
 
-            // 3. insert new points
+            // insert new points
             const insertSql = `
-                INSERT INTO points (user_id, match_id, points)
+                INSERT INTO points
+                (user_id, match_id, points)
                 VALUES ?
             `;
 
@@ -148,7 +206,10 @@ router.post("/admin/update-match", isAdmin, (req, res) => {
 
             db.query(insertSql, [values], (err) => {
 
-                if (err) return res.send("Insert points error");
+                if (err) {
+                    console.log(err);
+                    return res.send(err);
+                }
 
                 res.redirect("/admin");
 
@@ -160,62 +221,144 @@ router.post("/admin/update-match", isAdmin, (req, res) => {
 
 });
 
+/* =========================
+   CREATE USER
+========================= */
 
+router.post("/admin/users/create", isAdmin, async (req, res) => {
 
-router.post("/admin/users/create", isAdmin, (req, res) => {
+    const { username, password, display_name } = req.body;
 
-    const { username } = req.body;
+    try {
 
-    const sql = `
-        INSERT INTO users (username, password, role, display_name)
-        VALUES (?, NULL, 'user', ?)
-    `;
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    db.query(sql, [username], (err) => {
+        const sql = `
+            INSERT INTO users
+            (username, password, role, display_name)
+            VALUES (?, ?, 'user', ?)
+        `;
 
-        if (err) return res.send("Create user error");
+        db.query(sql, [username, hashedPassword, display_name], (err) => {
 
-        res.redirect("/admin");
+            if (err) {
+                console.log(err);
+                return res.send(err);
+            }
 
-    });
+            res.redirect("/admin");
+
+        });
+
+    } catch (err) {
+        console.log(err);
+        return res.send("Hash error");
+    }
 
 });
+
+/* =========================
+   DELETE USER
+========================= */
 
 router.post("/admin/users/delete", isAdmin, (req, res) => {
 
     const { user_id } = req.body;
 
-    const sql = `
-        DELETE FROM users
-        WHERE id = ?
-    `;
+    // delete predictions
+    db.query(
+        "DELETE FROM predictions WHERE user_id = ?",
+        [user_id],
+        (err) => {
 
-    db.query(sql, [user_id], (err) => {
+            if (err) {
+                console.log(err);
+                return res.send(err);
+            }
 
-        if (err) return res.send("Delete user error");
+            // delete points
+            db.query(
+                "DELETE FROM points WHERE user_id = ?",
+                [user_id],
+                (err) => {
 
-        res.redirect("/admin");
+                    if (err) {
+                        console.log(err);
+                        return res.send(err);
+                    }
 
-    });
+                    // delete rankings
+                    db.query(
+                        "DELETE FROM rankings_prediction WHERE user_id = ?",
+                        [user_id],
+                        (err) => {
+
+                            if (err) {
+                                console.log(err);
+                                return res.send(err);
+                            }
+
+                            // delete user
+                            db.query(
+                                "DELETE FROM users WHERE id = ?",
+                                [user_id],
+                                (err) => {
+
+                                    if (err) {
+                                        console.log(err);
+                                        return res.send(err);
+                                    }
+
+                                    res.redirect("/admin");
+
+                                }
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
 
 });
 
-router.post("/admin/users/reset-password", isAdmin, (req, res) => {
+/* =========================
+   CHANGE PASSWORD
+========================= */
 
-    const { user_id } = req.body;
+router.post("/admin/users/change-password", isAdmin, async (req, res) => {
 
-    const sql = `
-        UPDATE users
-        SET password = NULL
-        WHERE id = ?
-    `;
+    const { user_id, new_password } = req.body;
 
-    db.query(sql, [user_id], (err) => {
+    try {
 
-        if (err) return res.send("Reset password error");
+        const hashedPassword = await bcrypt.hash(new_password, 10);
 
-        res.redirect("/admin");
+        const sql = `
+            UPDATE users
+            SET password = ?
+            WHERE id = ?
+        `;
 
-    });
+        db.query(sql, [hashedPassword, user_id], (err) => {
+
+            if (err) {
+                console.log(err);
+                return res.send(err);
+            }
+
+            res.redirect("/admin");
+
+        });
+
+    } catch (err) {
+        console.log(err);
+        return res.send("Hash error");
+    }
 
 });
+
+module.exports = router;

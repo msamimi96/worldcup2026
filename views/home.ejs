@@ -9,193 +9,192 @@
 </head>
 
 <body>
+
+    <% const reversedMatches = matches.slice().reverse(); %>
 <div class="page">
-        <div class="top-bar">
 
-            <div class="user-name">
-                خوش آمدی، <%= user.display_name %>
-            </div>
+    <!-- TOP BAR -->
+    <div class="top-bar">
 
-            <form action="/logout" method="POST">
-                <button type="submit">خروج</button>
-            </form>
-
+        <div class="user-name">
+            خوش اومدی، <%= user.display_name %>
         </div>
-<div class="upcoming-matches-container">
 
-    <h2 class="title">بازی ها</h2>
+        <form action="/logout" method="POST">
+            <button type="submit">خروج</button>
+        </form>
 
-    <div class="upcoming-matches" id="matchesContainer">
-
-            <% matches.forEach(match => { %>
-
-                    <% const isLocked = new Date(match.kickoff) < new Date(); %>
-
-                    <form class="match" data-kickoff="<%= new Date(match.kickoff).toISOString() %>" action="/predict" method="POST">
-
-                        <input type="hidden" name="match_id" value="<%= match.id %>">
-
-                        <div class="date-time">
-
-                            <span>
-                                <%= new Intl.DateTimeFormat(
-                                    'fa-IR-u-ca-persian',
-                                    {
-                                        year: 'numeric',
-                                        month: '2-digit',
-                                        day: '2-digit',
-                                        timeZone: 'Asia/Tehran'
-                                    }
-                                ).format(new Date(match.kickoff)) %>
-                            </span>
-
-                            <span>
-                                <%= new Intl.DateTimeFormat(
-                                    'fa-IR',
-                                    {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false,
-                                        timeZone: 'Asia/Tehran'
-                                    }
-                                ).format(new Date(match.kickoff)) %>
-                            </span>
-
-                        </div>
-
-                        <div class="team-row">
-                            <span class="team-name"><%= match.team1 %></span>
-
-                            <input
-                                type="number"
-                                name="pred1"
-                                min="0"
-                                max="10"
-                                class="team-input"
-                                placeholder="-"
-                                <%= isLocked ? "disabled" : "" %>
-                                required
-                            >
-                        </div>
-
-                        <div class="vs">VS</div>
-
-                        <div class="team-row">
-                            <span class="team-name"><%= match.team2 %></span>
-
-                            <input
-                                type="number"
-                                name="pred2"
-                                min="0"
-                                max="10"
-                                class="team-input"
-                                placeholder="-"
-                                <%= isLocked ? "disabled" : "" %>
-                                required
-                            >
-                        </div>
-
-                        <textarea
-                            name="side_prediction"
-                            placeholder="پیش بینی جانبی..."
-                            maxlength="255"
-                        ></textarea>
-
-                        <button type="submit" class="submit-btn" <%= isLocked ? "disabled" : "" %>>
-                            ثبت پیش بینی
-                        </button>
-
-                    </form>
-
-                <% }) %>
     </div>
 
-</div>
+    <!-- MATCHES -->
+    <div class="upcoming-matches-container">
 
-        <!-- Table -->
+        <h2 class="title">بازی ها</h2>
 
-<!-- =========================
-     STANDINGS SECTION
-========================= -->
+        <div class="upcoming-matches" id="matchesContainer">
 
-<div class="standings-section">
+            <% matches.slice().reverse().forEach(match => { %>
 
-    <h2 class="standings-title">جدول امتیازات</h2>
+                <% const isLocked = new Date(match.kickoff) < new Date(); %>
 
-    <div class="table-wrapper">
+                <form class="match <%= isLocked ? 'expired-match' : '' %>" 
+                      data-kickoff="<%= new Date(match.kickoff).toISOString() %>"
+                      action="/predict"
+                      method="POST">
 
-        <table class="standings-table">
+                    <input type="hidden" name="match_id" value="<%= match.id %>">
 
-            <!-- =========================
-                 HEADER (MATCHES)
-            ========================== -->
-            <thead>
-                <tr>
+                    <!-- DATE -->
+                    <div class="date-time">
 
-                    <!-- Left Sticky Column -->
-                    <th class="sticky-left points-header">
-                        امتیاز
-                    </th>
+                        <span>
+                            <%= new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                timeZone: 'Asia/Tehran'
+                            }).format(new Date(match.kickoff)) %>
+                        </span>
 
-                    <!-- Dynamic Match Columns -->
-                    <% matches.forEach(match => { %>
-                        <th>
-                            <%= match.team1 %>
-                            <br>
+                        <span>
+                            <%= new Intl.DateTimeFormat('fa-IR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false,
+                                timeZone: 'Asia/Tehran'
+                            }).format(new Date(match.kickoff)) %>
+                        </span>
 
-                            <% if (match.is_finished) { %>
-                                <%= match.result1 %> - <%= match.result2 %>
-                            <% } else { %>
-                                VS
-                            <% } %>
+                    </div>
 
-                            <br>
-                            <%= match.team2 %>
+                    <!-- TEAM 1 -->
+                    <div class="team-row">
+                        <span class="team-name"><%= match.team1 %></span>
+
+                        <input type="number"
+                               name="pred1"
+                               min="0"
+                               max="10"
+                               class="team-input"
+                               placeholder="-"
+                               <%= isLocked ? "disabled" : "" %>
+                               required>
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <!-- TEAM 2 -->
+                    <div class="team-row">
+                        <span class="team-name"><%= match.team2 %></span>
+
+                        <input type="number"
+                               name="pred2"
+                               min="0"
+                               max="10"
+                               class="team-input"
+                               placeholder="-"
+                               <%= isLocked ? "disabled" : "" %>
+                               required>
+                    </div>
+
+                    <!-- SIDE PREDICTION -->
+                    <textarea name="side_prediction"
+                              class="side-prediction"
+                              placeholder="پیش بینی جانبی..."
+                              <%= isLocked ? "disabled" : "" %>
+                              maxlength="255"></textarea>
+
+                    <button type="submit"
+                            class="submit-btn <%= isLocked ? 'expired-submit' : '' %>"
+                            <%= isLocked ? "disabled" : "" %>>
+                        ثبت پیش بینی
+                    </button>
+
+                </form>
+
+            <% }) %>
+
+        </div>
+
+    </div>
+
+    <!-- =========================
+        LEADERBOARD
+    ========================= -->
+
+
+    <div class="standings-section">
+
+        <h2 class="standings-title">جدول امتیازات</h2>
+
+        <div class="table-wrapper">
+
+            <table class="standings-table">
+
+                <!-- HEADER -->
+                <thead>
+
+                    <tr>
+
+                        <!-- RANK -->
+                        <th class="rank-header">
+                            رتبه
                         </th>
-                    <% }) %>
 
-                    <!-- Right Sticky Column -->
-                    <th class="sticky-right player-header">
-                        بازیکن
-                    </th>
+                        <!-- PLAYER -->
+                        <th class="player-header">
+                            بازیکن
+                        </th>
 
-                </tr>
-            </thead>
+                        <!-- MATCHES -->
+                        <% matches.slice().reverse().forEach(match => { %>
 
-            <!-- =========================
-                 BODY (USERS)
-            ========================== -->
+                            <th>
+
+                                <%= match.team1 %>
+                                <br>
+
+                                <% if (match.is_finished) { %>
+
+                                    <%= match.result1 %> - <%= match.result2 %>
+
+                                <% } else { %>
+
+                                    VS
+
+                                <% } %>
+
+                                <br>
+
+                                <%= match.team2 %>
+
+                            </th>
+
+                        <% }) %>
+
+                        <!-- TOTAL POINTS -->
+                        <th class="points-header">
+                            امتیاز
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <!-- BODY -->
                 <tbody>
 
                     <% users.forEach((user, index) => { %>
 
-                        <tr class="
-                            <%= index === 0 ? 'gold' : '' %>
-                            <%= index === 1 ? 'silver' : '' %>
-                            <%= index === 2 ? 'bronze' : '' %>
-                        ">
+                        <tr class="<%= index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '' %>">
 
-                            <!-- Rank (NEW) -->
+                            <!-- RANK -->
                             <td class="rank">
                                 <%= index + 1 %>
                             </td>
 
-                            <!-- Total Points -->
-                            <td class="sticky-left total-points">
-                                <%= user.total_points ?? 0 %>
-                            </td>
-
-                            <!-- Match Points -->
-                            <% matches.forEach(match => { %>
-
-                                <td>
-                                    <%= user.points?.[match.id] ?? "-" %>
-                                </td>
-
-                            <% }) %>
-
-                            <!-- Username -->
-                            <td class="sticky-right player-name">
+                            <!-- PLAYER -->
+                            <td class="player-name">
 
                                 <div class="player-hover">
 
@@ -220,57 +219,115 @@
 
                             </td>
 
+                            <!-- MATCHES -->
+                            <% matches.slice().reverse().forEach(match => { %>
+
+                                <%
+
+                                    const data =
+                                        user.points?.[match.id];
+
+                                    const started =
+                                        new Date(match.kickoff) <= new Date();
+
+                                %>
+
+                                <td>
+
+                                    <% if (!data) { %>
+
+                                        -
+
+                                    <% } else { %>
+
+                                        <% if (started) { %>
+
+                                            <div class="prediction-box">
+
+                                                <div class="prediction">
+                                                    <%= data.prediction ?? "-" %>
+                                                </div>
+
+                                                <div class="points">
+                                                    <%= data.points ?? 0 %> pts
+                                                </div>
+
+                                                <% if (data.side_prediction) { %>
+
+                                                    <div class="side">
+                                                        📝 <%= data.side_prediction %>
+                                                    </div>
+
+                                                <% } %>
+
+                                            </div>
+
+                                        <% } else { %>
+
+                                            🔒
+
+                                        <% } %>
+
+                                    <% } %>
+
+                                </td>
+
+                            <% }) %>
+
+                            <!-- TOTAL POINTS -->
+                            <td class="total-points">
+                                <%= user.total_points ?? 0 %>
+                            </td>
+
                         </tr>
 
                     <% }) %>
 
                 </tbody>
 
-        </table>
+            </table>
+
+        </div>
 
     </div>
 
 </div>
-</div>
+
 <script src="homepage.js"></script>
 
-
+<!-- AUTO SCROLL TO NEXT MATCH -->
 <script>
-
 window.addEventListener("load", () => {
 
-    const container =
-        document.getElementById("matchesContainer");
-
-    const matches =
-        document.querySelectorAll(".match");
+    const container = document.getElementById("matchesContainer");
+    const matches = document.querySelectorAll(".match");
 
     const now = new Date();
-
     let targetMatch = null;
 
-    // find first upcoming match
+    // find next upcoming match
     matches.forEach(match => {
-
-        const kickoff =
-            new Date(match.dataset.kickoff);
+        const kickoff = new Date(match.dataset.kickoff);
 
         if (!targetMatch && kickoff > now) {
             targetMatch = match;
         }
-
     });
 
-    // scroll to it
-    if (targetMatch) {
+    // RTL-aware scroll positioning
+    setTimeout(() => {
 
-        container.scrollLeft =
-            targetMatch.offsetLeft;
+        if (targetMatch) {
+            container.scrollLeft = targetMatch.offsetLeft;
+        } else {
+            // fallback: go to far right (latest matches side)
+            container.scrollLeft = container.scrollWidth;
+        }
 
-    }
+    }, 50);
 
 });
-
 </script>
+
 </body>
 </html>
