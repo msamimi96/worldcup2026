@@ -681,4 +681,33 @@ body{
         font-size: 12px;
     }
 
+
+    /* ALL match columns (dynamic ones) */
+    .standings-table th:not(.rank-header):not(.player-header):not(.points-header),
+    .standings-table td:not(.rank):not(.player-name):not(.total-points) {
+        
+        min-width: 70px !important;
+        width: 70px !important;
+        padding: 6px 4px !important;
+        font-size: 11px;
+        line-height: 1.2;
+    }
+
+    .top-bar {
+        width: 90%;
+        margin-left: 5%;
+        padding: 14px 18px;
+        gap: 10px;
+
+    }
+
+    .user-name {
+        font-size: 18px;
+    }
+
+    .top-bar button {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+
 }
