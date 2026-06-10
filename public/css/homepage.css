@@ -639,18 +639,15 @@ body{
 
         font-size: 22px;
     }
-        .standings-title{
+    .standings-title{
         font-size: 22px;
     }
 
     .standings-table th,
     .standings-table td{
-
-        padding: 14px 10px;
-
-        font-size: 14px;
-
-        min-width: 90px;
+        min-width: 60px;
+        padding: 8px 6px;
+        font-size: 12px;
     }
 
     .rank,
@@ -658,16 +655,14 @@ body{
         position: static !important;
         width: 20px !important;
         min-width: 20px !important;
-        max-width: 20px !important;
     }
 
-        .player-name,
+    .player-name,
     .player-header {
         position: sticky;
         right: -20px !important; /* after rank */
         width: 50px !important;
-        min-width: 50px !important;
-        max-width: 80px !important;
+        min-width: 80px !important;
     }
 
     .total-points,
@@ -677,23 +672,6 @@ body{
         min-width: 40px !important;
     }
     
-    .standings-table th,
-    .standings-table td {
-        padding: 8px 6px;
-        font-size: 12px;
-    }
-
-
-    /* ALL match columns (dynamic ones) */
-    .standings-table th:not(.rank-header):not(.player-header):not(.points-header),
-    .standings-table td:not(.rank):not(.player-name):not(.total-points) {
-        min-width: 50px !important;
-        max-width: 70px !important;
-        width: 50px !important;
-        padding: 6px 4px !important;
-        font-size: 11px;
-        line-height: 1.2;
-    }
 
     .top-bar {
         width: 90%;
