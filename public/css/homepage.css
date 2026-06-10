@@ -658,6 +658,7 @@ body{
         position: static !important;
         width: 20px !important;
         min-width: 20px !important;
+        max-width: 20px !important;
     }
 
         .player-name,
@@ -665,7 +666,8 @@ body{
         position: sticky;
         right: -20px !important; /* after rank */
         width: 50px !important;
-        min-width: 80px !important;
+        min-width: 50px !important;
+        max-width: 80px !important;
     }
 
     .total-points,
@@ -685,9 +687,9 @@ body{
     /* ALL match columns (dynamic ones) */
     .standings-table th:not(.rank-header):not(.player-header):not(.points-header),
     .standings-table td:not(.rank):not(.player-name):not(.total-points) {
-        
-        min-width: 70px !important;
-        width: 70px !important;
+        min-width: 50px !important;
+        max-width: 70px !important;
+        width: 50px !important;
         padding: 6px 4px !important;
         font-size: 11px;
         line-height: 1.2;
@@ -698,7 +700,6 @@ body{
         margin-left: 5%;
         padding: 14px 18px;
         gap: 10px;
-
     }
 
     .user-name {
