@@ -137,12 +137,12 @@
                     <tr>
 
                         <!-- RANK -->
-                        <th class="rank-header">
+                        <th class="rank-header sticky-left-rank">
                             رتبه
                         </th>
 
                         <!-- PLAYER -->
-                        <th class="player-header">
+                        <th class="player-header sticky-left-player">
                             بازیکن
                         </th>
 
@@ -173,7 +173,7 @@
                         <% }) %>
 
                         <!-- TOTAL POINTS -->
-                        <th class="points-header">
+                        <th class="points-header sticky-right-points">
                             امتیاز
                         </th>
 
@@ -189,12 +189,12 @@
                         <tr class="<%= index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '' %>">
 
                             <!-- RANK -->
-                            <td class="rank">
+                            <td class="rank sticky-left-rank">
                                 <%= index + 1 %>
                             </td>
 
                             <!-- PLAYER -->
-                            <td class="player-name">
+                            <td class="player-name sticky-left-player">
 
                                 <div class="player-hover">
 
@@ -275,7 +275,7 @@
                             <% }) %>
 
                             <!-- TOTAL POINTS -->
-                            <td class="total-points">
+                            <td class="total-points sticky-right-points">
                                 <%= user.total_points ?? 0 %>
                             </td>
 
@@ -328,6 +328,13 @@ window.addEventListener("load", () => {
 
 });
 </script>
+
+
+<% if (submitted) { %>
+<script>
+    alert("پیشبینی شما ثبت شد");
+</script>
+<% } %>
 
 </body>
 </html>

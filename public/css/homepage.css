@@ -302,8 +302,8 @@ body{
 ========================= */
 
 .standings-table{
-    border-collapse: collapse;
-
+    border-collapse: separate;
+    border-spacing: 0;
     min-width: 1000px;
     width: 100%;
     text-align: center;
@@ -322,7 +322,7 @@ body{
 
     border: 1px solid rgba(255,255,255,0.15);
 
-    background: rgba(255,255,255,0.08);
+    background: rgba(0, 0, 0, 0.275);
 
     min-width: 110px;
 }
@@ -330,70 +330,13 @@ body{
 /* =========================
    HEADER
 ========================= */
-
-.standings-table thead th{
-
+.standings-table thead th {
     position: sticky;
     top: 0;
-
-    z-index: 5;
-
-    background: rgba(20,20,20,0.85);
-
-    font-size: 14px;
-    line-height: 1.6;
+    z-index: 1000;
+    background: rgba(20,20,20,0.98);
 }
 
-/* =========================
-   STICKY LEFT COLUMN
-========================= */
-
-.sticky-left{
-
-    position: sticky;
-    right: 0;
-    left: auto;
-    z-index: 6;
-
-    background: rgba(25,25,25,0.95) !important;
-}
-
-/* =========================
-   STICKY RIGHT COLUMN
-========================= */
-
-.sticky-right{
-
-    position: sticky;
-    left: 0;
-    right: auto;
-
-    z-index: 6;
-
-    background: rgba(25,25,25,0.95) !important;
-}
-
-/* =========================
-   PLAYER NAMES
-========================= */
-
-.player-name{
-    font-weight: bold;
-    font-size: 16px;
-    width: 160px;
-    text-align: right;
-}
-
-/* =========================
-   TOTAL POINTS
-========================= */
-
-.total-points{
-    font-weight: bold;
-    width: 80px;
-    text-align: center;
-    color: #272210;
-}
 
 /* =========================
    HOVER EFFECT
@@ -459,10 +402,93 @@ body{
     font-weight: bold;
 }
 
+
+
+/* RANK */
+.rank-header,
 .rank {
-    width: 40px;
-    text-align: center;
-    font-weight: bold;
+    position: sticky;
+    right: 0;
+    z-index: 1100;
+    background: rgba(30,30,30,0.98) !important;
+    width: 60px;
+}
+
+/* PLAYER */
+.player-header,
+.player-name {
+    position: sticky;
+    right: 60px;
+    z-index: 1100;
+    background: rgba(30,30,30,0.98) !important;
+    width: 160px;
+}
+
+/* POINTS */
+.points-header,
+.total-points {
+    position: sticky;
+    left: 0;
+    z-index: 1100;
+    background: rgba(30,30,30,0.98) !important;
+    width: 90px;
+}
+
+
+.standings-table thead th.rank-header,
+.standings-table thead th.player-header,
+.standings-table thead th.points-header {
+    z-index: 1200;
+}
+
+
+/* =========================
+   STICKY RANK COLUMN
+========================= */
+
+.sticky-left-rank{
+
+    position: sticky;
+
+    right: 0;
+
+    z-index: 200;
+
+    background: rgba(30, 30, 30, 0.95) !important;
+
+    min-width: 60px;
+}
+
+/* =========================
+   STICKY PLAYER COLUMN
+========================= */
+
+.sticky-left-player{
+
+    position: sticky;
+
+    right: 60px;
+
+    z-index: 400;
+
+    background: rgba(30, 30, 30, 0.95) !important;
+
+    min-width: 160px;
+}
+
+/* =========================
+   STICKY TOTAL POINTS
+========================= */
+
+.sticky-right-points{
+
+    position: sticky;
+
+    left: 0;
+
+    z-index: 200;
+
+    min-width: 90px;
 }
 
 .side {

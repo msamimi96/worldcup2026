@@ -80,7 +80,7 @@ router.post("/predict", isUser, (req, res) => {
                     ],
                     (err) => {
                         if (err) return res.send("Update error");
-                        res.redirect("/home");
+                        res.redirect("/home?submitted=1");
                     }
                 );
             }
@@ -109,7 +109,7 @@ router.post("/predict", isUser, (req, res) => {
                 ],
                 (err) => {
                     if (err) return res.send("Insert error");
-                    res.redirect("/home");
+                    res.redirect("/home?submitted=1");
                 }
             );
 

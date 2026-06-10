@@ -221,6 +221,7 @@ router.get("/home", (req, res) => {
                                 user: req.session.user,
                                 matches,
                                 users: userList,
+                                submitted: req.query.submitted,
                                 now: new Date()
                             });
                         });
