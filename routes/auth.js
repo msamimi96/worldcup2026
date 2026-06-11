@@ -219,6 +219,7 @@ router.get("/home", (req, res) => {
                             // =========================
                             return res.render("home", {
                                 user: req.session.user,
+                                currentUserId: req.session.user.id,
                                 matches,
                                 users: userList,
                                 submitted: req.query.submitted,

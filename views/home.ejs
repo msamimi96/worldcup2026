@@ -240,33 +240,33 @@
 
                                     <% } else { %>
 
-                                        <% if (started) { %>
+                                        <% if (started || user.id === currentUserId) { %>
 
-                                            <div class="prediction-box">
+                                                <div class="prediction-box">
 
-                                                <div class="prediction">
-                                                    <%= data.prediction ?? "-" %>
-                                                </div>
-
-                                                <div class="points">
-                                                    <%= data.points ?? 0 %> pts
-                                                </div>
-
-                                                <% if (data.side_prediction) { %>
-
-                                                    <div class="side">
-                                                        📝 <%= data.side_prediction %>
+                                                    <div class="prediction">
+                                                        <%= data.prediction ?? "-" %>
                                                     </div>
 
-                                                <% } %>
+                                                    <div class="points">
+                                                        <%= data.points ?? 0 %> pts
+                                                    </div>
 
-                                            </div>
+                                                    <% if (data.side_prediction) { %>
 
-                                        <% } else { %>
+                                                        <div class="side">
+                                                            📝 <%= data.side_prediction %>
+                                                        </div>
 
-                                            🔒
+                                                    <% } %>
 
-                                        <% } %>
+                                                </div>
+
+                                            <% } else { %>
+
+                                                🔒
+
+                                            <% } %>
 
                                     <% } %>
 
