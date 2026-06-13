@@ -151,22 +151,15 @@
 
                             <th>
 
-                                <%= match.team1 %>
-                                <br>
+                                <%= match.team1 %> - <%= match.team2 %>
 
                                 <% if (match.is_finished) { %>
 
+                                    <br>
+
                                     <%= match.result1 %> - <%= match.result2 %>
 
-                                <% } else { %>
-
-                                    VS
-
                                 <% } %>
-
-                                <br>
-
-                                <%= match.team2 %>
 
                             </th>
 

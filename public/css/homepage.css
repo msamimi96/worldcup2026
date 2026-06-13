@@ -293,7 +293,7 @@ body{
 
     padding: 15px;
 
-    overflow-y: hidden; /* 🚫 removes vertical scrollbar */
+    overflow-y: visible; 
     max-height: none;   /* ensures full height */
 }
 
@@ -326,6 +326,18 @@ body{
 
     min-width: 110px;
 }
+
+.standings-table th:not(.rank-header):not(.player-header):not(.points-header) {
+        min-width: 120px !important;
+        width: 120px !important;
+        white-space: nowrap;
+}
+
+    /* Match cells only */
+.standings-table td:not(.rank):not(.player-name):not(.total-points) {
+        min-width: 120px !important;
+        width: 120px !important;
+    }
 
 /* =========================
    HEADER
@@ -376,7 +388,7 @@ body{
 
     display: none;
 
-    z-index: 999;
+    z-index: 2000;
 
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
 
@@ -648,6 +660,19 @@ body{
         min-width: 60px;
         padding: 8px 6px;
         font-size: 12px;
+    }
+
+        /* Match headers only */
+    .standings-table th:not(.rank-header):not(.player-header):not(.points-header) {
+        min-width: 120px !important;
+        width: 120px !important;
+        white-space: nowrap;
+    }
+
+    /* Match cells only */
+    .standings-table td:not(.rank):not(.player-name):not(.total-points) {
+        min-width: 120px !important;
+        width: 120px !important;
     }
 
     .rank,
