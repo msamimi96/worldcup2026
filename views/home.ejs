@@ -127,7 +127,7 @@
 
         <h2 class="standings-title">جدول امتیازات</h2>
 
-        <div class="table-wrapper">
+        <div class="table-wrapper" id="standingsWrapper">
 
             <table class="standings-table">
 
@@ -147,23 +147,35 @@
                         </th>
 
                         <!-- MATCHES -->
-                        <% matches.slice().reverse().forEach(match => { %>
+                            <%
+                            let nextMatchFound = false;
+                            %>
 
-                            <th>
+                            <% matches.slice().reverse().forEach(match => { %>
 
-                                <%= match.team1 %> - <%= match.team2 %>
+                                <%
+                                const isNextMatch =
+                                    !nextMatchFound &&
+                                    new Date(match.kickoff) > new Date();
 
-                                <% if (match.is_finished) { %>
+                                if (isNextMatch) nextMatchFound = true;
+                                %>
 
-                                    <br>
+                                <th class="<%= isNextMatch ? 'next-match-column' : '' %>">
 
-                                    <%= match.result1 %> - <%= match.result2 %>
+                                    <%= match.team1 %> - <%= match.team2 %>
 
-                                <% } %>
+                                    <% if (match.is_finished) { %>
 
-                            </th>
+                                        <br>
 
-                        <% }) %>
+                                        <%= match.result1 %> - <%= match.result2 %>
+
+                                    <% } %>
+
+                                </th>
+
+                            <% }) %>
 
                         <!-- TOTAL POINTS -->
                         <th class="points-header sticky-right-points">
@@ -318,6 +330,29 @@ window.addEventListener("load", () => {
         }
 
     }, 50);
+
+            // =========================
+            // STANDINGS AUTO SCROLL
+            // =========================
+
+            const standingsWrapper =
+                document.getElementById("standingsWrapper");
+
+            const nextColumn =
+                document.querySelector(".next-match-column");
+
+            if (standingsWrapper && nextColumn) {
+
+                setTimeout(() => {
+
+                    nextColumn.scrollIntoView({
+                        behavior: "auto",
+                        inline: "center",
+                        block: "nearest"
+                    });
+
+                }, 50);
+            }
 
 });
 </script>

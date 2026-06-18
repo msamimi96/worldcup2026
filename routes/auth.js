@@ -6,7 +6,12 @@ const db = require("../database/db");
 /* =========================
    LOGIN PAGE
 ========================= */
-router.get("/", (req, res) => {
+app.get("/", (req, res) => {
+
+    if (req.session.user) {
+        return res.redirect("/home");
+    }
+
     res.render("login");
 });
 
