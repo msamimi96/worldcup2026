@@ -117,8 +117,10 @@ router.get("/home", (req, res) => {
 
     // 1. Get matches
     db.query(matchSql, (err, matches) => {
-        if (err) return res.send("DB error (matches)");
-
+        if (err){
+            console.log(err) 
+            return res.send("DB error (matches)");
+        }
         // 2. Get users
         db.query(userSql, (err, users) => {
             if (err) {
