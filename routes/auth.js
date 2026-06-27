@@ -121,8 +121,10 @@ router.get("/home", (req, res) => {
 
         // 2. Get users
         db.query(userSql, (err, users) => {
-            if (err) return res.send("DB error (users)");
-
+            if (err) {
+                console.log(err)
+                return res.send("DB error (users)");
+            }
             // 3. Get points
             db.query(pointsSql, (err, points) => {
                 if (err) return res.send("DB error (points)");
