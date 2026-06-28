@@ -306,7 +306,7 @@ body{
 
     overflow-y: visible; 
     max-height: none;   /* ensures full height */
-    border:3px solid rgba(255, 217, 0, 0.267);
+    border:1px solid rgba(255, 217, 0, 0.267);
 
     box-shadow:
         0 12px 35px rgba(0,0,0,.28);
